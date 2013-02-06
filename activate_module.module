@@ -1,0 +1,20 @@
+<?php
+
+/*
+ * Implementation of hook_views_pre_render().
+ */
+function activate_module_views_post_render(&$view, &$output, &$cache){
+	// Make sure this is only for the specific view you want to modified
+	if ($view->name == "codex_items") {
+		if($view->current_display == 'attachment_1'){			
+			$output = '<div class="view-content"><span class="views-summary views-summary-unformatted"><a href="/codex">All</a></span>';
+			foreach ($view->result AS $result) {
+				$output.= '<span class="views-summary views-summary-unformatted">    |    <a href="/codex?views_args='.$result->title_truncated.'">'.$result->title_truncated.'</a></span>';
+			} 
+			$output .= '</div>';
+		}
+		
+	}
+}
+
+?>

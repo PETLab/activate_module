@@ -1,0 +1,28 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the activate_module module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function activate_module_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function activate_module_uninstall() {
+
+}
+
+/**
+ * Implements hook_schema().
+ */
+function activate_module_schema() {
+  $schema = array();
+
+  return $schema;
+}

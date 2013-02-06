@@ -1,0 +1,8 @@
+name = "Activate Custom Module"
+description = "Assist with Activate custom layouts and configurations"
+package = "System"
+core = "7.x"
+
+#  include the files that contains your Module classes
+files[] = activate_module.install
+files[] = activate_module.module
