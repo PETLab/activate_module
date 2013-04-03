@@ -19,7 +19,12 @@
 		beautytips_add_beautytips($options);
 	}
 ?>
-<div class="">
-	<div class="title active">Showing instructions for <?php echo($pParamHash[$pParamHash['current_software']]->name );?> </div>
-	<div class="link"><a href="javascript:void(0)" onclick="softwareSwitch(<?php echo($pParamHash[$pParamHash['other_software']]->tid);?> );">Change to <?php echo($pParamHash[$pParamHash['other_software']]->name );?></a></div>
+<div class="software-cookie-selectors">
+	<? if( $pParamHash[$pParamHash['current_software']]->name == 'GameMaker') { ?>
+		<div class="cookie-select active">Showing instructions for <?php echo($pParamHash[$pParamHash['current_software']]->name );?> </div>
+		<div class="cookie-select link"><a href="javascript:void(0)" onclick="softwareSwitch(<?php echo($pParamHash[$pParamHash['other_software']]->tid);?> );">Change to <?php echo($pParamHash[$pParamHash['other_software']]->name );?></a></div>
+	<?}else{?>	
+		<div class="cookie-select link"><a href="javascript:void(0)" onclick="softwareSwitch(<?php echo($pParamHash[$pParamHash['other_software']]->tid);?> );">Change to <?php echo($pParamHash[$pParamHash['other_software']]->name );?></a></div>
+		<div class="cookie-select active">Showing instructions for <?php echo($pParamHash[$pParamHash['current_software']]->name );?> </div>
+	<? } ?>
 </div>

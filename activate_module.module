@@ -24,31 +24,34 @@ function activate_module_views_post_render(&$view, &$output, &$cache){
  */
 function activate_module_views_pre_view(&$view, &$display_id, &$args){
 // Make sure this is only for the specific view you want to modified
-	if ($view->name == "challenge_levels") {
-		$pParamHash = drupal_get_query_parameters($_REQUEST);
-		$view_overrides = array();
-		switch ($display_id){
-			case'challenge_listing_rookie':
-			case'challenge_listing_apprentice':
-			case'challenge_listing_champion':
-				/*Get the current view options*/
-				$filters = $view->display_handler->get_option('filters');
+	switch ($view->name){
+		case'challenge_levels':
+		case'challenge_overview':
+			$pParamHash = drupal_get_query_parameters($_REQUEST);
+			$view_overrides = array();
+			switch ($display_id){
+				case 'challenge_listing_rookie':
+				case 'challenge_listing_apprentice':
+				case 'challenge_listing_champion':
+				case 'challenge_posting':
+					/*Get the current view options*/
+					$filters = $view->display_handler->get_option('filters');
+					/*Check which challenge software to query by checking cookie*/
+					$tid = activate_module_get_software_cookie($pParamHash);				
+					$filters['field_software_tid']['value'] = array($tid=>$tid);
 				
-				/*Check which challenge software to query by checking cookie*/
-				$tid = activate_module_get_software_cookie($pParamHash);				
-				$filters['field_software_tid']['value'] = array($tid=>$tid);
-				
-				/*Set up overrides master hash and let views override our custom options*/	
-				$view_overrides ['filters'] = $filters;
-			break;
-		}
-		/*let views override our custom options*/
-		if(!empty ( $view_overrides ) ){
-			foreach ($view_overrides as $option => $definition) {
-				$view->display_handler->override_option($option, $definition);
+					/*Set up overrides master hash and let views override our custom options*/	
+					$view_overrides ['filters'] = $filters;
+				break;
 			}
+			break;
+	}
+	/*let views override our custom options*/
+	if(!empty ( $view_overrides ) ){
+		foreach ($view_overrides as $option => $definition) {
+			$view->display_handler->override_option($option, $definition);
 		}
-  	}
+	}
 }
 
 /*
