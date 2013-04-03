@@ -1,10 +1,10 @@
 <?php
-
 /*
  * Implementation of hook_views_pre_render().
  */
 function activate_module_views_post_render(&$view, &$output, &$cache){
 	// Make sure this is only for the specific view you want to modified
+	/*For Codex listing*/
 	if ($view->name == "codex_items") {
 		if($view->current_display == 'attachment_1'){			
 			$output = '<div class="view-content"><span class="views-summary views-summary-unformatted"><a href="/codex">All</a></span>';
@@ -17,4 +17,152 @@ function activate_module_views_post_render(&$view, &$output, &$cache){
 	}
 }
 
+
+/*
+ * Implementation of hook_views_pre_view().
+ * Dynamic modification of view
+ */
+function activate_module_views_pre_view(&$view, &$display_id, &$args){
+// Make sure this is only for the specific view you want to modified
+	if ($view->name == "challenge_levels") {
+		$pParamHash = drupal_get_query_parameters($_REQUEST);
+		$view_overrides = array();
+		switch ($display_id){
+			case'challenge_listing_rookie':
+			case'challenge_listing_apprentice':
+			case'challenge_listing_champion':
+				/*Get the current view options*/
+				$filters = $view->display_handler->get_option('filters');
+				
+				/*Check which challenge software to query by checking cookie*/
+				$tid = activate_module_get_software_cookie($pParamHash);				
+				$filters['field_software_tid']['value'] = array($tid=>$tid);
+				
+				/*Set up overrides master hash and let views override our custom options*/	
+				$view_overrides ['filters'] = $filters;
+			break;
+		}
+		/*let views override our custom options*/
+		if(!empty ( $view_overrides ) ){
+			foreach ($view_overrides as $option => $definition) {
+				$view->display_handler->override_option($option, $definition);
+			}
+		}
+  	}
+}
+
+/*
+ * activate_module_get_software_cookie().
+ * Get the current cookie and additional information of the two types of software
+ */
+function activate_module_get_software_cookie( &$pParamHash ){
+	
+	$terms = taxonomy_get_term_by_name('GameSalad', 'software');
+	$pParamHash['GameSalad'] = array_shift($terms);
+
+	$terms = taxonomy_get_term_by_name('GameMaker', 'software');
+	$pParamHash['GameMaker'] = array_shift($terms);
+		
+	if( empty( $_COOKIE['am_challenge_software'] ) ){
+		/* If not set, Game Salad is default */
+		setcookie("am_challenge_software",  $pParamHash['GameSalad']->tid, time()+3600*24*30,'/');
+		$tid = $pParamHash['GameSalad']->tid;
+	}else{
+		$tid = $_COOKIE['am_challenge_software'];
+		/*Check if this term id is a valid number*/
+		if($tid != $pParamHash['GameMaker']->tid && $tid != $pParamHash['GameSalad']->tid){
+			/* If not set, Game Salad is default */
+			setcookie("am_challenge_software",  $pParamHash['GameSalad']->tid, time()+3600*24*30,"/");
+			$tid = $pParamHash['GameSalad']->tid;
+		}
+	}
+	
+	return $tid;
+}
+
+/*
+ * Implementation of hook_theme().
+ */
+function activate_module_theme($existing, $type, $theme, $path){
+	$templates = array ();
+	/*For Cookie block*/
+	$templates ['am_software_cookie'] = array(
+      'variables' => array('pParamHash' => array() ),
+      'template' => 'am_software_cookie', // place you file in 'templates' folder of you module folder
+      'path' => drupal_get_path('module', 'activate_module') .'/templates'
+    );
+  return $templates;
+}
+
+/** * Implements hook_block_info(). */
+function activate_module_block_info() {
+	$blocks = array();
+	/*For Software Cookie block*/
+	$blocks['am_software_select_bk'] = array(
+		'info' => t('Activate Module Challenge Software Selection Block'),
+		'cache' => DRUPAL_NO_CACHE,
+ 	); 	
+	return $blocks; 
+}
+
+
+/*** Implements hook_block_view().*/
+function activate_module_block_view($block_name = '') {
+	switch ($block_name){
+		/*For Software Cookie block*/
+		case 'am_software_select_bk':
+			// Use template to create markup
+			$pParamHash = array();
+			$pParamHash['block_name'] = $block_name;
+			$pParamHash['tid'] = activate_module_get_software_cookie( $pParamHash );
+			
+			if($pParamHash['GameSalad']->tid == $pParamHash['tid']){
+				$pParamHash['current_software'] = 'GameSalad';
+				$pParamHash['other_software'] = 'GameMaker';
+			}elseif($pParamHash['GameMaker']->tid == $pParamHash['tid']){
+				$pParamHash['current_software'] = 'GameMaker';
+				$pParamHash['other_software'] = 'GameSalad';
+			}
+			$block = array(
+				'subject' => t(''),
+				'content' => theme('am_software_cookie', array('pParamHash'=>$pParamHash) ),
+			);
+		break;
+	}
+	
+	if( !empty( $block ) ) {
+		return $block;
+	}
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+
+/*function activate_module_module_implements_alter(&$module_list, $context){
+	//Make sure our custom module is set last on the module list queue so our overrides take precedence.	
+	if($context === "form_alter"){
+		$temp = $module_list['activate_module'];
+		// Removing the fiftycan_module key/value
+		unset($module_list['activate_module']);
+		// Adding the fiftycan_module key value as the last member in the list
+		$module_list['activate_module'] = $temp;
+	}
+}*/
+
+/* Beauty tips does a bad job of including excanvas by requiring it in their own module as an add on*/
+/* This is bad for code management via git plus they load it on every pass.*/
+/*Create function to add excanvas only for IE. It will be a submodule from this module*/
+function activate_module_add_html_head (){
+	/* IE support for the canvas htm5 element*/
+	$path = drupal_get_path('module', 'activate_module');
+	if (file_exists($path. '/js/excanvas/excanvas.js')) {
+		$src =$path. '/js/excanvas/excanvas.js';
+		$element = array(
+			'#type' => 'markup',
+			'#markup' => '<!--[if IE]><script language="javascript" type="text/javascript" src="'.$src.'"></script><![endif]-->',
+		);
+		drupal_add_html_head($element, 'excanvas');
+	}
+}
 ?>
