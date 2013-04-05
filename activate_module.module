@@ -1,19 +1,48 @@
 <?php
 /*
- * Implementation of hook_views_pre_render().
+ * Implementation of hook_views_post_render().
  */
 function activate_module_views_post_render(&$view, &$output, &$cache){
 	// Make sure this is only for the specific view you want to modified
-	/*For Codex listing*/
-	if ($view->name == "codex_items") {
-		if($view->current_display == 'attachment_1'){			
-			$output = '<div class="view-content"><span class="views-summary views-summary-unformatted"><a href="/codex">All</a></span>';
-			foreach ($view->result AS $result) {
-				$output.= '<span class="views-summary views-summary-unformatted">    |    <a href="/codex?views_args='.$result->title_truncated.'">'.$result->title_truncated.'</a></span>';
-			} 
-			$output .= '</div>';
-		}
-		
+	
+	switch ($view->name){
+		/*For Codex listing*/
+		case'codex_items':
+			if($view->current_display == 'attachment_1'){			
+				$output = '<div class="view-content"><span class="views-summary views-summary-unformatted"><a href="/codex">All</a></span>';
+				foreach ($view->result AS $result) {
+					$output.= '<span class="views-summary views-summary-unformatted">    |    <a href="/codex?views_args='.$result->title_truncated.'">'.$result->title_truncated.'</a></span>';
+				} 
+				$output .= '</div>';
+			}
+		break;
+		case'instructions':
+			/*For Challenge Instruction dropdown pagination*/
+			if($view->current_display == 'ci_step_titles'){
+				/*Get the page number if one exists or set to default */
+				$pParamHash = drupal_get_query_parameters($_REQUEST);
+				$selected_page = 0;
+				if(!empty($_REQUEST['page'])){
+					$selected_page = $_REQUEST['page'];
+				}
+				
+				/*Rewrite output of view to dropdown select box looping through the views result set for step header*/
+				$output ='<div id="challenge_instructions_steps"><div class="steps-header">Jump to a Section: </div>';
+				$output .= '<div class="steps-selection"><select onchange="challengeInstructionStepChange(this);">';
+				$counter = 0;
+				foreach ($view->result AS $result) {
+					$selected = '';
+					if( !empty($result->field_field_instruct_header[0]['rendered']['#markup']) ){
+						if( $counter == $selected_page ){$selected = 'selected';}
+						$output .= '<option value="'.$counter.'"  '.$selected.'     >'.$result->field_field_instruct_header[0]['rendered']['#markup'].'</option>';
+					}			
+					$counter++;
+				}
+				$output .= '</select></div>';
+				$selected_page++;
+				$output.='<div class="steps-pager">Step '.$selected_page.' of '.$counter.'</div></div>';
+			}
+		break;
 	}
 }
 
