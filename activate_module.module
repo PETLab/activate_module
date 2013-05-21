@@ -171,6 +171,16 @@ function activate_module_block_view($block_name = '') {
 				'content' => theme('am_software_cookie', array('pParamHash'=>$pParamHash) ),
 			);
 		break;
+		/*For User link block*/
+		case 'am_userlink_bk':
+			// Use template to create markup
+			$pParamHash = array();
+			$pParamHash['block_name'] = $block_name;
+			$block = array(
+				'subject' => t(''),
+				'content' => theme('am_userlink', array('pParamHash'=>$pParamHash) ),
+			);
+		break;
 	}
 	
 	if( !empty( $block ) ) {
