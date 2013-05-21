@@ -187,6 +187,20 @@ function activate_module_block_view($block_name = '') {
 		return $block;
 	}
 }
+/**
+* Implements hook_menu_alter.
+*/
+function activate_module_menu_alter(&$items) {
+    //Change edit
+    
+    // Change the title of user profile pages to the user's name. 
+    $items['user/%user']['title callback'] = 'activate_module_user_page_title';
+    $items['user/%user/edit']['title']  = 'Edit your profile';
+}
+/*Callback function for menu alter user titles*/
+function activate_module_user_page_title() {
+    return 'Profile';
+}
 
 /**
  * Implements hook_module_implements_alter().
