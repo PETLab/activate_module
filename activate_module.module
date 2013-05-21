@@ -123,6 +123,12 @@ function activate_module_theme($existing, $type, $theme, $path){
       'template' => 'am_software_cookie', // place you file in 'templates' folder of you module folder
       'path' => drupal_get_path('module', 'activate_module') .'/templates'
     );
+    /*For userlink block*/
+    $templates ['am_userlink'] = array(
+      'variables' => array('pParamHash' => array() ),
+      'template' => 'am_userlink', // place you file in 'templates' folder of you module folder
+      'path' => drupal_get_path('module', 'activate_module') .'/templates'
+    );
   return $templates;
 }
 
@@ -134,6 +140,11 @@ function activate_module_block_info() {
 		'info' => t('Activate Module Challenge Software Selection Block'),
 		'cache' => DRUPAL_NO_CACHE,
  	); 	
+ 	/*For User Link block*/
+	$blocks['am_userlink_bk'] = array(
+		'info' => t('Activate Module User Links Block'),
+		'cache' => DRUPAL_NO_CACHE,
+ 	);
 	return $blocks; 
 }
 
