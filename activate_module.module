@@ -194,7 +194,7 @@ function activate_module_menu_alter(&$items) {
     
     // Change the title of user profile pages to the user's name. 
     $items['user/%user']['title callback'] = 'activate_module_user_page_title';
-    $items['user/%user/edit']['title']  = 'Edit your profile';
+    $items['user/%user/edit']['title']  = 'My profile';
 }
 /*Callback function for menu alter user titles*/
 function activate_module_user_page_title() {
