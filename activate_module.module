@@ -191,7 +191,6 @@ function activate_module_block_view($block_name = '') {
 * Implements hook_menu_alter.
 */
 function activate_module_menu_alter(&$items) {
-    //Change edit
     
     // Change the title of user profile pages to the user's name. 
     $items['user/%user']['title callback'] = 'activate_module_user_page_title';
@@ -199,7 +198,18 @@ function activate_module_menu_alter(&$items) {
 }
 /*Callback function for menu alter user titles*/
 function activate_module_user_page_title() {
-    return 'Profile';
+    return 'My profile';
+}
+/**
+* Implements hook_form_alter.
+*/
+function activate_module_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'user_register_form') {
+    drupal_set_title(t('Create an Activate! account'));
+  }
+  elseif ($form_id == 'user_pass') {
+    drupal_set_title(t('Request new password'));
+  }
 }
 
 /**
