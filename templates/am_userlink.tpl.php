@@ -19,35 +19,37 @@ if( user_is_logged_in() ){
 			<div class="user_link account-link">
 				<?php 
 				if($games){
-					print l(t('Account Information'),'user/' . $user->uid . '/edit');
+					print l(t('My profile'),'user/' . $user->uid . '/edit');
 			
 				}else{ 
-					print 'Account Information';
+					print 'My profile';
 				} ?>
 			</div>
 			<div class="seperator">&nbsp;&nbsp;|&nbsp;&nbsp;</div>
 			<div class="user_link games-link">
 				<?php 
 				if($games){
-					print 'Games';
+					print 'My games';
 				}else{
-					print l(t('Games'),'play-a-game/my-games');
+					print l(t('My games'),'play-a-game/my-games');
 				}?>		
 			</div>
-			<div class="user_link game-add">
+			
+		</div>
+        <div class="user_link game-add">
 				<?php if($games){
 					print l(t('Add a game'), 'node/add/game', array('attributes' => array('class' => array('button'))));
 				} ?>		
-			</div>
-		</div>
+		</div>	
 		<?php 
 		/*Games specific markup for grabbing public url*/
 		if($games){ ?>
 			<div class="user_games">
 				<div class="form-item form-type-textfield">
-					<label for="edit-userlink">Weblink for your games </label>
+					<label for="edit-userlink">Weblink for your games: </label>
 					<input class="form-text" type="text" id="edit-userlink" value="<?php echo($user_game_link)?>" readonly="TRUE" onfocus="select();"/>
-					<div class="description"><a href="<?php echo($user_game_link)?>">go to link</a> | <a id='user-link-copy' href="#">copy</a></div>
+					<!--<div class="description"><a href="<?php //echo($user_game_link)?>">Go to link</a> | <a id='user-link-copy' href="#">copy</a></div>-->
+                    <span class="description">Copy this link by selecting the field’s content and pressing ctrl+c!</span>
 				</div>
 				<script type="text/javascript">
 					/*Code snippet for copy link and browser compatibility of focus function when textfield is readonly*/
